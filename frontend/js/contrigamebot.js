@@ -1,152 +1,219 @@
 (() => {
   'use strict';
 
-  const SAVE_KEY = 'contrigamebot-lantern-v1';
-  const initialState = () => ({ scene: 'arrival', chapter: 1, energy: 3, courage: 0, insight: 0, ending: '' });
-  const scenes = {
-    arrival: {
-      chapter: 1, icon: '☾', title: 'A lantern gone dark',
-      text: 'At dusk, the Shire’s great lantern flickers out. The village keeper asks you to find its missing glowstone in Bramblewood. A trail of tiny silver leaves leads away from the square.',
-      choices: [
-        { label: 'Ask the keeper for a map', next: 'crossroads', insight: 1 },
-        { label: 'Set off at once and follow the leaves', next: 'crossroads', courage: 1 }
-      ]
-    },
-    crossroads: {
-      chapter: 2, icon: '⌘', title: 'The Bramblewood fork',
-      text: 'The trail splits. To the left, a rickety bridge crosses a stream. To the right, soft blue lights drift between the trees. Somewhere nearby, a small bird is calling for help.',
-      choices: [
-        { label: 'Take the old bridge toward the birdcall', next: 'bridge', courage: 1 },
-        { label: 'Follow the blue lights into the grove', next: 'grove', insight: 1 }
-      ]
-    },
-    bridge: {
-      chapter: 3, icon: '⌁', title: 'The bridge and the jay',
-      text: 'A bright-feathered jay is tangled in a loose ribbon near the bridge. The stream burbles below, and the bird watches you with hopeful eyes.',
-      choices: [
-        { label: 'Carefully free the jay', next: 'meeting', courage: 1, energy: -1 },
-        { label: 'Offer a berry and let it lead the way', next: 'meeting', insight: 1 }
-      ]
-    },
-    grove: {
-      chapter: 3, icon: '✧', title: 'The listening grove',
-      text: 'The blue lights gather around a ring of old stone chimes. Their quiet melody seems to point toward a hollow oak, where a jay is waiting.',
-      choices: [
-        { label: 'Listen for the tune hidden in the chimes', next: 'meeting', insight: 1 },
-        { label: 'Call a cheerful greeting into the trees', next: 'meeting', courage: 1 }
-      ]
-    },
-    meeting: {
-      chapter: 4, icon: '♧', title: 'A little help goes a long way',
-      text: 'The jay flutters to the hollow oak and nudges a glowing stone from its nest. It is the missing glowstone! The bird chirps as if inviting you to choose how to carry it home.',
-      choices: [
-        { label: 'Carry it carefully, following the jay’s song', next: 'return', insight: 1 },
-        { label: 'Invite the jay to fly beside you', next: 'return', courage: 1 }
-      ]
-    },
-    return: {
-      chapter: 5, icon: '✦', title: 'Light for everyone',
-      text: 'Back in the village square, neighbors gather around the great lantern. The glowstone fits perfectly into its heart. How will you help the Shire celebrate?',
-      choices: [
-        { label: 'Ask everyone to share one kind wish', next: 'ending', ending: 'together' },
-        { label: 'Lead the jay’s merry song', next: 'ending', ending: 'song' }
-      ]
-    },
-    ending: {
-      chapter: 5, icon: '☼', title: 'The Shire shines again',
-      text: 'Warm light spills across the square. The keeper thanks you, and the jay settles on the lantern’s rim.',
-      choices: []
-    }
-  };
+  const games = window.CONTRIGAMEBOT_GAMES || {};
+  const gamePicker = document.getElementById('game-picker');
+  const gameIds = Object.keys(games);
+  if (!gameIds.length) return;
+
+  const defaultGameId = gameIds[0];
+  const selectedGameId = new URLSearchParams(window.location.search).get('game');
+  let gameId = games[selectedGameId] ? selectedGameId : defaultGameId;
+  let game = games[gameId];
+  let state;
 
   const el = (id) => document.getElementById(id);
   const ui = {
+    title: el('game-title'), kicker: el('game-kicker'), description: el('game-description'),
     chapter: el('chapter-count'), energy: el('energy-stat'), courage: el('courage-stat'), insight: el('insight-stat'),
-    icon: el('scene-icon'), label: el('scene-label'), title: el('scene-title'), text: el('scene-text'),
-    choices: el('choices'), ending: el('ending-message'), reset: el('reset-game'), saveNote: el('save-note')
+    icon: el('scene-icon'), label: el('scene-label'), sceneTitle: el('scene-title'), text: el('scene-text'),
+    choices: el('choices'), ending: el('ending-message'), reset: el('reset-game'), saveNote: el('save-note'),
+    questList: el('quest-list'), questCount: el('quest-count'), inventory: el('inventory-list')
   };
+
+  function storageKey(id) { return `contrigamebot:${id}:v1`; }
+
+  function initialState() {
+    return {
+      scene: game.start,
+      stats: { ...game.stats },
+      inventory: {},
+      completedQuests: [],
+      ending: ''
+    };
+  }
+
+  function isValidState(saved) {
+    return saved && game.scenes[saved.scene] && saved.stats &&
+      ['energy', 'courage', 'insight'].every((key) => Number.isFinite(saved.stats[key])) &&
+      saved.inventory && typeof saved.inventory === 'object' && Array.isArray(saved.completedQuests);
+  }
 
   function loadState() {
     try {
-      const saved = JSON.parse(localStorage.getItem(SAVE_KEY));
-      if (saved && scenes[saved.scene] && Number.isInteger(saved.energy) && Number.isInteger(saved.courage) && Number.isInteger(saved.insight)) {
-        return { ...initialState(), ...saved };
-      }
+      const saved = JSON.parse(localStorage.getItem(storageKey(gameId)));
+      if (isValidState(saved)) return saved;
     } catch (error) {
-      // Storage can be unavailable in private browsing; the game still works for this visit.
+      // Storage may be disabled; the game remains playable for this visit.
     }
     return initialState();
   }
 
-  let state = loadState();
-
   function saveState() {
     try {
-      localStorage.setItem(SAVE_KEY, JSON.stringify(state));
-      ui.saveNote.textContent = 'Your progress saves in this browser.';
+      localStorage.setItem(storageKey(gameId), JSON.stringify(state));
+      ui.saveNote.textContent = 'Progress saves in this browser for this game.';
     } catch (error) {
       ui.saveNote.textContent = 'Progress lasts for this visit; browser storage is unavailable.';
     }
   }
 
+  function addItem(itemChange) {
+    const nextQuantity = (state.inventory[itemChange.id] || 0) + (itemChange.quantity || 1);
+    if (nextQuantity > 0) state.inventory[itemChange.id] = nextQuantity;
+    else delete state.inventory[itemChange.id];
+  }
+
+  function applyEffects(effects) {
+    if (!effects) return;
+    Object.entries(effects.stats || {}).forEach(([name, change]) => {
+      state.stats[name] = Math.max(0, (state.stats[name] || 0) + change);
+    });
+    (effects.items || []).forEach(addItem);
+    (effects.completeQuests || []).forEach((questId) => {
+      if (!state.completedQuests.includes(questId)) state.completedQuests.push(questId);
+    });
+    if (effects.ending) state.ending = effects.ending;
+  }
+
   function endingCopy() {
-    if (state.ending === 'together') {
-      return 'With your ' + state.insight + ' insight and ' + state.courage + ' courage, you helped the whole village make the lantern’s light their own. The keeper names you Friend of the Shire.';
+    const stats = state.stats;
+    return state.ending === 'together'
+      ? `With ${stats.insight} insight and ${stats.courage} courage, you helped the whole village make the lantern’s light their own. The keeper names you Friend of the Shire.`
+      : `Your ${stats.courage} courage and ${stats.insight} insight carried the jay’s song through the square. The villagers join in, and the evening becomes a celebration.`;
+  }
+
+  function renderQuests() {
+    const currentScene = game.scenes[state.scene];
+    const completed = new Set(state.completedQuests);
+    const quests = game.quests;
+    ui.questCount.textContent = `${completed.size}/${quests.length}`;
+    ui.questList.replaceChildren();
+
+    quests.forEach((quest) => {
+      const isComplete = completed.has(quest.id);
+      const isAvailable = quest.availableAt.includes(state.scene) || isComplete;
+      const card = document.createElement('article');
+      card.className = `quest-card${isComplete ? ' is-complete' : ''}${!isAvailable ? ' is-locked' : ''}`;
+      const title = document.createElement('h3');
+      title.textContent = quest.title;
+      const description = document.createElement('p');
+      description.textContent = isComplete ? 'Quest complete — well done!' : quest.description;
+      const badge = document.createElement('span');
+      badge.className = 'quest-status';
+      badge.textContent = isComplete ? 'COMPLETE' : (isAvailable ? (quest.optional ? 'SIDE QUEST' : 'ACTIVE') : 'UPCOMING');
+      card.append(badge, title, description);
+      ui.questList.append(card);
+    });
+  }
+
+  function renderInventory() {
+    ui.inventory.replaceChildren();
+    const entries = Object.entries(state.inventory).filter(([, quantity]) => quantity > 0);
+    if (!entries.length) {
+      const empty = document.createElement('li');
+      empty.className = 'inventory-empty';
+      empty.textContent = 'Your pack is empty. Your discoveries will appear here.';
+      ui.inventory.append(empty);
+      return;
     }
-    return 'Your ' + state.courage + ' courage and ' + state.insight + ' insight carried the jay’s song through the square. The villagers join in, and the evening becomes a celebration.';
+    entries.forEach(([itemId, quantity]) => {
+      const item = game.items[itemId];
+      if (!item) return;
+      const row = document.createElement('li');
+      row.className = 'inventory-item';
+      const icon = document.createElement('span');
+      icon.className = 'item-icon';
+      icon.setAttribute('aria-hidden', 'true');
+      icon.textContent = item.icon;
+      const details = document.createElement('span');
+      details.className = 'item-details';
+      const name = document.createElement('strong');
+      name.textContent = item.name;
+      const description = document.createElement('small');
+      description.textContent = item.description;
+      details.append(name, description);
+      const count = document.createElement('span');
+      count.className = 'item-quantity';
+      count.textContent = `×${quantity}`;
+      row.append(icon, details, count);
+      ui.inventory.append(row);
+    });
   }
 
   function choose(choice) {
-    state.energy = Math.max(0, state.energy + (choice.energy || 0));
-    state.courage += choice.courage || 0;
-    state.insight += choice.insight || 0;
-    if (choice.ending) state.ending = choice.ending;
+    applyEffects(choice.effects);
     state.scene = choice.next;
-    state.chapter = scenes[state.scene].chapter;
     saveState();
     render();
   }
 
   function render() {
-    const scene = scenes[state.scene];
-    ui.chapter.textContent = `${scene.chapter} / 5`;
-    ui.energy.textContent = state.energy;
-    ui.courage.textContent = state.courage;
-    ui.insight.textContent = state.insight;
+    const scene = game.scenes[state.scene];
+    ui.chapter.textContent = `${scene.chapter} / ${game.chapters}`;
+    ui.energy.textContent = state.stats.energy;
+    ui.courage.textContent = state.stats.courage;
+    ui.insight.textContent = state.stats.insight;
     ui.icon.textContent = scene.icon;
     ui.label.textContent = `CHAPTER ${scene.chapter}`;
-    ui.title.textContent = scene.title;
+    ui.sceneTitle.textContent = scene.title;
     ui.text.textContent = scene.text;
     ui.choices.replaceChildren();
     ui.ending.hidden = state.scene !== 'ending';
     ui.ending.textContent = state.scene === 'ending' ? endingCopy() : '';
+    renderQuests();
+    renderInventory();
 
     if (state.scene === 'ending') {
       const replay = document.createElement('button');
       replay.type = 'button';
       replay.className = 'choice-button';
-      replay.textContent = 'Play the story again';
+      replay.textContent = 'Play this story again';
       replay.addEventListener('click', () => { state = initialState(); saveState(); render(); });
       ui.choices.append(replay);
       return;
     }
 
-    for (const choice of scene.choices) {
+    scene.choices.forEach((choice) => {
       const button = document.createElement('button');
       button.type = 'button';
       button.className = 'choice-button';
       button.textContent = choice.label;
       button.addEventListener('click', () => choose(choice));
       ui.choices.append(button);
-    }
+    });
   }
 
+  function selectGame(nextGameId) {
+    gameId = nextGameId;
+    game = games[gameId];
+    state = loadState();
+    const params = new URLSearchParams(window.location.search);
+    params.set('game', gameId);
+    window.history.replaceState({}, '', `${window.location.pathname}?${params.toString()}`);
+    ui.title.textContent = game.title;
+    ui.kicker.textContent = game.kicker;
+    ui.description.textContent = game.description;
+    render();
+  }
+
+  gameIds.forEach((id) => {
+    const option = document.createElement('option');
+    option.value = id;
+    option.textContent = games[id].title;
+    gamePicker.append(option);
+  });
+  gamePicker.value = gameId;
+  gamePicker.addEventListener('change', () => selectGame(gamePicker.value));
   ui.reset.addEventListener('click', () => {
     state = initialState();
     saveState();
     render();
-    ui.title.focus?.();
   });
 
+  state = loadState();
+  ui.title.textContent = game.title;
+  ui.kicker.textContent = game.kicker;
+  ui.description.textContent = game.description;
   render();
 })();

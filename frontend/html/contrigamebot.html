@@ -4,31 +4,43 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#101a19">
-  <title>ContriGameBot — The Lantern in the Shire</title>
+  <title>ContriGameBot — Game Master</title>
   <link rel="stylesheet" href="../css/contrigamebot.css">
 </head>
 <body>
   <main class="game-shell">
     <header class="topbar">
       <a class="wordmark" href="contrigamebot.html" aria-label="ContriGameBot home"><span class="brand-mark" aria-hidden="true">✦</span> CONTRIGAMEBOT</a>
-      <span class="edition">A small playable story</span>
+      <label class="game-picker-label" for="game-picker">GAME WORLD
+        <select id="game-picker" aria-label="Choose a game"></select>
+      </label>
     </header>
 
     <section class="hero" aria-labelledby="game-title">
-      <p class="eyebrow">A SHIRE HEALTH QUEST • GAME MASTER DEMO</p>
-      <h1 id="game-title">The Lantern in the Shire</h1>
-      <p class="intro">The village lantern has gone dark. Make your way through Bramblewood, meet its curious neighbors, and help bring the evening lights back.</p>
+      <p class="eyebrow" id="game-kicker">GAME MASTER • STORY QUEST</p>
+      <h1 id="game-title">Loading your world…</h1>
+      <p class="intro" id="game-description"></p>
     </section>
 
     <section class="game-layout" aria-label="Game">
-      <aside class="status-card" aria-label="Your journey status">
-        <p class="eyebrow">YOUR JOURNEY</p>
-        <div class="status-row"><span>Chapter</span><strong id="chapter-count">1 / 5</strong></div>
-        <div class="status-row"><span>Energy</span><strong id="energy-stat">3</strong></div>
-        <div class="status-row"><span>Courage</span><strong id="courage-stat">0</strong></div>
-        <div class="status-row"><span>Insight</span><strong id="insight-stat">0</strong></div>
-        <p class="save-note" id="save-note">Your progress saves in this browser.</p>
-        <button class="reset-button" id="reset-game" type="button">Start over</button>
+      <aside class="sidebar" aria-label="Player dashboard">
+        <section class="panel status-card" aria-label="Your journey status">
+          <p class="eyebrow panel-heading">YOUR JOURNEY</p>
+          <div class="status-row"><span>Chapter</span><strong id="chapter-count">1 / 5</strong></div>
+          <div class="status-row"><span>Energy</span><strong id="energy-stat">3</strong></div>
+          <div class="status-row"><span>Courage</span><strong id="courage-stat">0</strong></div>
+          <div class="status-row"><span>Insight</span><strong id="insight-stat">0</strong></div>
+          <p class="save-note" id="save-note">Progress saves in this browser.</p>
+          <button class="reset-button" id="reset-game" type="button">Restart this game</button>
+        </section>
+        <section class="panel quest-panel" aria-labelledby="quests-heading">
+          <div class="panel-title-row"><h2 id="quests-heading">Quest log</h2><span class="count-pill" id="quest-count">0/0</span></div>
+          <div id="quest-list" class="quest-list"></div>
+        </section>
+        <section class="panel inventory-panel" aria-labelledby="inventory-heading">
+          <div class="panel-title-row"><h2 id="inventory-heading">Inventory</h2><span class="inventory-icon" aria-hidden="true">▤</span></div>
+          <ul id="inventory-list" class="inventory-list"></ul>
+        </section>
       </aside>
 
       <article class="story-card" aria-live="polite" aria-atomic="true">
@@ -40,8 +52,9 @@
       </article>
     </section>
 
-    <footer class="footnote">A fictional, choice-based demo. It does not collect health information or provide medical advice.</footer>
+    <footer class="footnote">A modular, choice-based Game Master demo. This fictional story does not collect health information or provide medical advice.</footer>
   </main>
+  <script src="../js/contrigamebot-games.js" defer></script>
   <script src="../js/contrigamebot.js" defer></script>
 </body>
 </html>
