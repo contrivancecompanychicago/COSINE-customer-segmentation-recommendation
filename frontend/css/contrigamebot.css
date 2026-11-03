@@ -6,6 +6,8 @@ body { min-height: 100vh; margin: 0; background: radial-gradient(ellipse at 50% 
 button, select { font: inherit; }
 .game-shell { width: min(1180px, calc(100% - 40px)); margin: 0 auto; padding: 28px 0 24px; }
 .topbar { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--line); }
+.topbar-tools { display: flex; align-items: center; gap: 16px; }
+.version-badge { padding: 5px 8px; border: 1px solid rgba(239, 199, 122, .3); border-radius: 20px; color: var(--gold); font-size: .68rem; font-weight: 700; letter-spacing: .06em; white-space: nowrap; }
 .wordmark { color: var(--ink); text-decoration: none; font-size: .78rem; font-weight: 700; letter-spacing: .13em; white-space: nowrap; }
 .brand-mark { color: var(--gold); margin-right: 8px; font-size: 1.15rem; }
 .game-picker-label { display: flex; align-items: center; gap: 12px; color: var(--muted); font-size: .66rem; font-weight: 700; letter-spacing: .14em; }
@@ -60,6 +62,7 @@ h1 { margin: 10px 0 12px; font-size: clamp(2.5rem, 6vw, 4.25rem); line-height: 1
 @media (max-width: 760px) {
   .game-shell { width: min(100% - 28px, 560px); padding-top: 18px; }
   .topbar { align-items: flex-start; }
+  .topbar-tools { align-items: flex-end; gap: 9px; }
   .game-picker-label { display: grid; gap: 5px; font-size: .58rem; }
   .game-picker-label select { min-width: 165px; max-width: 52vw; padding: 9px 24px 9px 9px; font-size: .78rem; }
   .hero { padding: 34px 0 24px; }
@@ -73,5 +76,5 @@ h1 { margin: 10px 0 12px; font-size: clamp(2.5rem, 6vw, 4.25rem); line-height: 1
   .reset-button { align-self: end; justify-self: end; }
   .story-card { min-height: 360px; }
 }
-@media (max-width: 430px) { .sidebar { grid-template-columns: 1fr; } .status-card { grid-column: auto; } }
+@media (max-width: 430px) { .topbar { flex-wrap: wrap; } .topbar-tools { width: 100%; justify-content: space-between; } .sidebar { grid-template-columns: 1fr; } .status-card { grid-column: auto; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; } }
