@@ -19,6 +19,14 @@
         formats: ['text adventure', 'choice based'], platforms: ['browser'],
         devices: null, sessionMinutes: null, status: 'playable',
         playUrl: 'contrigamebot.html?game=clockwork-lighthouse', packId: 'clockwork-lighthouse'
+      },
+      {
+        id: 'krebsville-nights-unequal-treatment', title: 'Krebsville Nights: Unequal Treatment',
+        description: 'A COSINE MUD adventure following Dr. Grant through hospital scenes, commands, choices, and quests.',
+        genres: ['adventure', 'role playing'], themes: ['hospital', 'unequal treatment'],
+        formats: ['text adventure', 'command based', 'choice based'], platforms: ['browser'],
+        devices: null, sessionMinutes: null, status: 'playable',
+        playUrl: 'https://krebsvilleunequaltreatmentpt-1.replit.app'
       }
     ]
   };
