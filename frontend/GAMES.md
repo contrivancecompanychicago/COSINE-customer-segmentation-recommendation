@@ -1,6 +1,6 @@
 # Adding games to ContriGameBot
 
-ContriGameBot 0.2.0 uses data-driven game packs. The engine is in `contrigamebot.js`; built-in games are in `contrigamebot-games.js`. Game progress is stored in this browser using a player name, game ID, and one of three save slots. It is not a user account and does not sync to another device.
+ContriGameBot 0.3.0 uses data-driven game packs. The engine is in `contrigamebot.js`; built-in games are in `contrigamebot-games.js`. Game progress is stored in this browser using a player name, game ID, and one of three save slots. It is not a user account and does not sync to another device.
 
 ## Game pack fields
 
@@ -20,3 +20,7 @@ Keep IDs stable after release to preserve existing saves. All choice destination
 The Game pack tools on the game page can create a starter pack, import JSON, and export the selected game as JSON. Imported or created packs persist in the current browser and are not automatically committed to the repository. Export a pack, review it, then add it to the built-in registry to ship it to all players. Imported pack validation checks required metadata, starting stats, scenes, and choice destinations; only import JSON from a trusted source.
 
 To add a built-in game, add another entry to `contrigamebot-games.js` using the Clockwork Lighthouse or Lantern game as an example. The current save system is local-browser prototype functionality: there are no accounts, server saves, or cross-device synchronization.
+
+## Make a game discoverable
+
+Playable packs and recommendation entries are separate. Add reviewed metadata to the shared catalog following [CATALOG.md](CATALOG.md). Externally hosted games need a catalog entry but do not need a playable pack.

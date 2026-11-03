@@ -2,6 +2,13 @@
 
 Notable changes to ContriGameBot are documented here. Until the first stable release, version `0.x` indicates a pre-release prototype and the interface or game-pack format may change.
 
+## 0.3.0 — 2026-11-03
+
+- Added a shared versioned game catalog independent of playable scene packs.
+- Added a chat-style preference matcher with catalog-grounded explanations, unknown metadata disclosures, and explicit alternative results.
+- Added catalog validation and recommendation tests, external-game authoring guidance, and packaged static assets.
+- This baseline uses keyword rules; no AI model or server-side chat storage is connected.
+
 ## 0.2.0 — 2026-11-03
 
 Reusable game packs and local profile features:

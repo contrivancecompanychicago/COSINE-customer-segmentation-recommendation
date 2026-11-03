@@ -1,6 +1,10 @@
 # ContriGameBot
 
-**Version 0.2.0** — a reusable, browser-based Game Master prototype. The package includes two playable game packs, a quest log, inventory, player-name profiles, three local save slots, and tools to create/import/export game packs.
+**Version 0.3.0** — a reusable, browser-based Game Master prototype. The package includes two playable game packs, a quest log, inventory, player-name profiles, three local save slots, and tools to create/import/export game packs.
+
+## Find a game
+
+Open `html/recommender.html` for a chat-style preference matcher using the shared game catalog. This first baseline uses keyword rules, without a connected AI model. Unknown device support and session lengths are disclosed. See [CATALOG.md](CATALOG.md) to add built-in or externally hosted games without changing the recommender engine.
 
 ## Install
 
@@ -47,7 +51,7 @@ npm test
 npm pack --dry-run
 ```
 
-`npm test` checks the built-in pack structure and references. Publish from this `frontend` directory when the npm scope is configured and the release is approved:
+`npm test` checks the built-in pack structure, catalog references, and recommendation behavior. Publish from this `frontend` directory when the npm scope is configured and the release is approved:
 
 ```sh
 npm publish --access public

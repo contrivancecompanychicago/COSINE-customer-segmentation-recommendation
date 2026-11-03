@@ -1,7 +1,7 @@
 {
   "name": "@contrivancecompanychicago/contrigamebot",
-  "version": "0.2.0",
-  "description": "A modular, browser-based choice adventure Game Master with quests, inventory, and reusable game packs.",
+  "version": "0.3.0",
+  "description": "Catalog-grounded game recommendations with a chat-style interface and optional playable adventure packs.",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -27,10 +27,17 @@
     "GAMES.md",
     "README.md",
     "VERSION",
-    "scripts/validate-game-packs.js"
+    "scripts/validate-game-packs.js",
+    "html/recommender.html",
+    "css/recommender.css",
+    "js/game-catalog.js",
+    "js/game-recommender.js",
+    "js/recommender-chat.js",
+    "CATALOG.md",
+    "scripts/test-recommender.js"
   ],
   "scripts": {
-    "test": "node scripts/validate-game-packs.js",
+    "test": "node scripts/validate-game-packs.js && node scripts/test-recommender.js",
     "prepublishOnly": "npm test"
   },
   "publishConfig": {

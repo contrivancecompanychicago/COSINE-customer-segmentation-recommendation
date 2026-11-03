@@ -1,3 +1,11 @@
+# ContriGameBot / COSINE
+
+ContriGameBot v0.3.0 adds a game catalog and chat-style preference matcher alongside the optional playable adventures. Start with [frontend/README.md](frontend/README.md) and [the catalog guide](frontend/CATALOG.md).
+
+Serve `frontend` with a static server, then open `/html/recommender.html`. The recommender uses keyword rules; no AI model is connected yet. Catalog entries can point to built-in packs or reviewed external games. The legacy phone recommendation backend below is independent and is not required to run ContriGameBot.
+
+---
+
 # Customer Segmentation Recommendation
 
 ### About
