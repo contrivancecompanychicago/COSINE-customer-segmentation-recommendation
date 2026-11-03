@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ContriGameBot — Game Recommender</title>
+  <link rel="stylesheet" href="../css/recommender.css">
+</head>
+<body>
+  <main>
+    <header><p class="eyebrow">CONTRIGAMEBOT · v0.3.0</p><a href="contrigamebot.html">Open playable adventures</a></header>
+    <h1>Find your next adventure.</h1>
+    <p>Tell ContriGameBot the genres, themes, or game formats you enjoy.</p>
+    <p class="note">Catalog matching prototype. Replies use keyword rules, without a connected AI model. Device support and session length are shown as unknown until verified. Requests stay on this page and are not saved.</p>
+    <div id="chat-log" role="log" aria-label="Recommendation conversation" aria-live="polite" aria-relevant="additions"></div>
+    <form id="recommend-form">
+      <label for="preferences">What would you like to play?</label>
+      <textarea id="preferences" rows="3" maxlength="500" required placeholder="I want a fantasy text adventure in a forest"></textarea>
+      <div class="actions"><button type="submit">Find games</button><button id="clear-chat" type="button">Clear conversation</button></div>
+    </form>
+    <noscript>This recommender requires JavaScript.</noscript>
+  </main>
+  <script src="../js/game-catalog.js" defer></script>
+  <script src="../js/game-recommender.js" defer></script>
+  <script src="../js/recommender-chat.js" defer></script>
+</body>
+</html>
