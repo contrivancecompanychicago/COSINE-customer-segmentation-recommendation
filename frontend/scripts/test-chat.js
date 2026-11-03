@@ -22,7 +22,7 @@ async function main() {
   const fetchMock = async (url, options) => {
     if (url === '/api/config') return { ok: true, json: async () => ({ aiEnabled: true }) };
     bodies.push(JSON.parse(options.body));
-    if (fail) return { ok: false };
+    if (fail) return { ok: false, json: async () => ({ code: 'AI_QUOTA', error: 'test-secret raw provider error' }) };
     return { ok: true, json: async () => ({ mode: 'ai', ...api.recommend(catalog, 'lighthouse rescue') }) };
   };
   vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../js/recommender-chat.js'), 'utf8'), {
@@ -42,6 +42,8 @@ async function main() {
   assert.equal(bodies[2].messages.length, 1);
   fail = true; await submit('forest fantasy');
   assert.ok(ids['mode-note'].textContent.includes('latest request only'));
+  assert.ok(ids['mode-note'].textContent.includes('API quota is insufficient'));
+  assert.ok(!ids['mode-note'].textContent.includes('test-secret'));
   assert.ok(ids['chat-log'].children.at(-1).children[0].textContent.includes('Keyword matching'));
   fail = false; await submit('Fresh context');
   assert.equal(bodies.at(-1).messages.length, 1);

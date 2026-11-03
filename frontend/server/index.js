@@ -2,9 +2,10 @@
 const http = require('node:http');
 const fs = require('node:fs/promises');
 const path = require('node:path');
-const { aiRecommend } = require('./ai-recommend');
+const { aiRecommend, publicDiagnostic } = require('./ai-recommend');
 const root = path.resolve(__dirname, '..');
 function createServer({ apiKey = process.env.OPENAI_API_KEY, model = process.env.OPENAI_MODEL || 'gpt-5-mini', fetchImpl = fetch } = {}) {
+  apiKey = typeof apiKey === 'string' ? apiKey.trim() : '';
   let requests = 0, windowStart = Date.now();
   function json(res, status, body) { res.writeHead(status, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' }); res.end(JSON.stringify(body)); }
   return http.createServer(async (req, res) => {
@@ -28,7 +29,7 @@ function createServer({ apiKey = process.env.OPENAI_API_KEY, model = process.env
         if (Date.now() - windowStart > 60000) { windowStart = Date.now(); requests = 0; }
         if (++requests > 20) return json(res, 429, { error: 'Please wait before trying again' });
         try { return json(res, 200, { mode: 'ai', ...await aiRecommend(messages, { apiKey, model, fetchImpl }) }); }
-        catch (_) { return json(res, 503, { error: 'AI is unavailable; use keyword matching' }); }
+        catch (error) { return json(res, 503, publicDiagnostic(error)); }
       } catch (_) { return json(res, 400, { error: 'Invalid JSON request' }); }
     }
     if (!['GET', 'HEAD'].includes(req.method)) { res.writeHead(405); return res.end(); }
