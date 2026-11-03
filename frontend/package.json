@@ -1,7 +1,7 @@
 {
   "name": "@contrivancecompanychicago/contrigamebot",
-  "version": "0.3.0",
-  "description": "Catalog-grounded game recommendations with a chat-style interface and optional playable adventure packs.",
+  "version": "0.4.0",
+  "description": "Catalog-grounded game recommendations with optional server-side AI conversation and playable adventure packs.",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -34,16 +34,21 @@
     "js/game-recommender.js",
     "js/recommender-chat.js",
     "CATALOG.md",
-    "scripts/test-recommender.js"
+    "scripts/test-recommender.js",
+    "server/",
+    "scripts/test-ai.js",
+    "AI-SETUP.md",
+    "scripts/test-chat.js"
   ],
   "scripts": {
-    "test": "node scripts/validate-game-packs.js && node scripts/test-recommender.js",
-    "prepublishOnly": "npm test"
+    "test": "node scripts/validate-game-packs.js && node scripts/test-recommender.js && node scripts/test-ai.js && node scripts/test-chat.js",
+    "prepublishOnly": "npm test",
+    "start": "node server/index.js"
   },
   "publishConfig": {
     "access": "public"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=20"
   }
 }

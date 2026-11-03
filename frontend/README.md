@@ -1,10 +1,10 @@
 # ContriGameBot
 
-**Version 0.3.0** — a reusable, browser-based Game Master prototype. The package includes two playable game packs, a quest log, inventory, player-name profiles, three local save slots, and tools to create/import/export game packs.
+**Version 0.4.0** — a reusable, browser-based Game Master prototype. The package includes two playable game packs, a quest log, inventory, player-name profiles, three local save slots, and tools to create/import/export game packs.
 
 ## Find a game
 
-Open `html/recommender.html` for a chat-style preference matcher using the shared game catalog. This first baseline uses keyword rules, without a connected AI model. Unknown device support and session lengths are disclosed. See [CATALOG.md](CATALOG.md) to add built-in or externally hosted games without changing the recommender engine.
+Open `html/recommender.html` for a chat-style preference matcher using the shared game catalog. Keyword mode works on static hosting. Optional AI conversation runs through a local Node server; see [AI-SETUP.md](AI-SETUP.md) for server-side key configuration and testing. Unknown device support and session lengths are disclosed. See [CATALOG.md](CATALOG.md) to add built-in or externally hosted games without changing the recommender engine.
 
 ## Install
 
@@ -12,7 +12,7 @@ Open `html/recommender.html` for a chat-style preference matcher using the share
 npm install @contrivancecompanychicago/contrigamebot
 ```
 
-This package distributes static browser assets; it is not a Node.js server or a CommonJS/ES module API. Serve the installed package directory with a static web server and open `html/contrigamebot.html`. Its relative links load the packaged CSS and scripts.
+This package includes browser assets and an optional local Node server (`npm start`, Node 20+). It does not expose a public CommonJS/ES module API. Serve the installed package directory with a static web server and open `html/contrigamebot.html`. Its relative links load the packaged CSS and scripts.
 
 For example, from a project that installed the package:
 

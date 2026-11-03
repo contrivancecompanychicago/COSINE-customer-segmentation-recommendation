@@ -2,6 +2,13 @@
 
 Notable changes to ContriGameBot are documented here. Until the first stable release, version `0.x` indicates a pre-release prototype and the interface or game-pack format may change.
 
+## 0.4.0 — 2026-11-03
+
+- Added an optional local Node server using OpenAI Responses structured outputs to interpret game preferences and follow-up requests.
+- Added catalog-validated preference plans, exclusions, fixed catalog explanations, and explicit keyword fallback on API errors.
+- Added opt-in AI mode with in-page conversation context and clear/reset controls; API keys stay on the server.
+- Added setup documentation and mocked API/HTTP integration tests. Live model and browser verification remain separate setup checks.
+
 ## 0.3.0 — 2026-11-03
 
 - Added a shared versioned game catalog independent of playable scene packs.
