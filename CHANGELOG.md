@@ -10,6 +10,7 @@ Reusable game packs and local profile features:
 - Added the Clockwork Lighthouse as a second built-in playable game pack.
 - Added in-browser starter-pack creation plus JSON import/export for game packs.
 - Added basic import validation and migration of the v0.1.0 default-player save.
+- Added npm package metadata and pack-validation test for distributing the browser app as static assets.
 - Expanded the game pack guide and updated the interface version badge.
 
 Saves and custom packs remain in the current browser. There are no accounts, server-side saves, cloud synchronization, or production-ready security guarantees.

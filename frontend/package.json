@@ -1,0 +1,42 @@
+{
+  "name": "@contrivancecompanychicago/contrigamebot",
+  "version": "0.2.0",
+  "description": "A modular, browser-based choice adventure Game Master with quests, inventory, and reusable game packs.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/contrivancecompanychicago/COSINE-customer-segmentation-recommendation.git",
+    "directory": "frontend"
+  },
+  "homepage": "https://github.com/contrivancecompanychicago/COSINE-customer-segmentation-recommendation/tree/master/frontend",
+  "bugs": {
+    "url": "https://github.com/contrivancecompanychicago/COSINE-customer-segmentation-recommendation/issues"
+  },
+  "keywords": [
+    "game-master",
+    "interactive-fiction",
+    "browser-game",
+    "game-engine",
+    "quest"
+  ],
+  "files": [
+    "html/contrigamebot.html",
+    "css/contrigamebot.css",
+    "js/contrigamebot.js",
+    "js/contrigamebot-games.js",
+    "GAMES.md",
+    "README.md",
+    "VERSION",
+    "scripts/validate-game-packs.js"
+  ],
+  "scripts": {
+    "test": "node scripts/validate-game-packs.js",
+    "prepublishOnly": "npm test"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
