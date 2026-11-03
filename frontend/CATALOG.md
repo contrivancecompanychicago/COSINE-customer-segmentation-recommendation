@@ -35,11 +35,11 @@ No external games are included until their metadata and destination are reviewed
 
 The first baseline uses case-insensitive keyword matching on tags and title words, with equal weight per matching attribute. Results are sorted by score, then stable ID; at most three are shown. It recognizes mobile/phone and desktop requests, plus numeric minute limits or short/quick (15 minutes). Known incompatible device or time values exclude a game; unknown values are explicitly disclosed and do not count as matches. When nothing matches, available alternatives are labeled as alternatives. Scores are ranking values, not probabilities or suitability guarantees.
 
-This is a limited keyword baseline: it does not interpret arbitrary natural language, negation, or follow-up context. Each submitted request is independent. Requests and replies are not persisted or sent to a server. The UI clearly labels that no AI model is connected.
+This is a limited keyword baseline: it does not interpret arbitrary natural language, negation, or follow-up context. Each submitted request is independent. Requests and replies are not persisted or sent to a server. The UI labels keyword mode and offers AI mode only when the Node server reports a configured API key.
 
-## Adding AI later
+## Optional AI conversation
 
-Keep the catalog and ranking API as the factual source. A future server-side model can extract structured preferences and explain selected catalog IDs. Verify returned IDs and attributes before displaying them. Keep model credentials on the server. Do not derive recommendations from the legacy phone-purchase classifiers.
+The optional Node server interprets recent conversation into catalog vocabulary, exclusions, device, and time preferences. It validates the structured plan and ranks catalog entries; descriptions and links stay catalog-derived. See [AI-SETUP.md](AI-SETUP.md). Keep model credentials on the server. The legacy phone-purchase classifiers are independent.
 
 ## Validation
 

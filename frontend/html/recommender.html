@@ -8,10 +8,12 @@
 </head>
 <body>
   <main>
-    <header><p class="eyebrow">CONTRIGAMEBOT · v0.3.0</p><a href="contrigamebot.html">Open playable adventures</a></header>
+    <header><p class="eyebrow">CONTRIGAMEBOT · v0.4.0</p><a href="contrigamebot.html">Open playable adventures</a></header>
     <h1>Find your next adventure.</h1>
     <p>Tell ContriGameBot the genres, themes, or game formats you enjoy.</p>
-    <p class="note">Catalog matching prototype. Replies use keyword rules, without a connected AI model. Device support and session length are shown as unknown until verified. Requests stay on this page and are not saved.</p>
+    <p class="note">Game details come from the catalog. Device support and session length stay unknown until verified. Optional AI mode sends your request and recent conversation to OpenAI; chat is not saved by this app.</p>
+    <p id="mode-note" class="note" role="status">Checking recommendation mode…</p>
+    <label><input id="use-ai" type="checkbox" disabled> Use AI conversation</label>
     <div id="chat-log" role="log" aria-label="Recommendation conversation" aria-live="polite" aria-relevant="additions"></div>
     <form id="recommend-form">
       <label for="preferences">What would you like to play?</label>
