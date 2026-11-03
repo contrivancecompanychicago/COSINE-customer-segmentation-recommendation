@@ -1,19 +1,22 @@
 # Adding games to ContriGameBot
 
-ContriGameBot is a small data-driven story engine. The renderer and save-state logic live in `contrigamebot.js`; each game’s story content is defined separately in `contrigamebot-games.js`. This keeps future game worlds from being tangled together in the UI code.
+ContriGameBot 0.2.0 uses data-driven game packs. The engine is in `contrigamebot.js`; built-in games are in `contrigamebot-games.js`. Game progress is stored in this browser using a player name, game ID, and one of three save slots. It is not a user account and does not sync to another device.
 
-## Add a game pack
+## Game pack fields
 
-Add a new entry to `window.CONTRIGAMEBOT_GAMES` with a unique ID and these fields:
+Each entry in `window.CONTRIGAMEBOT_GAMES` is keyed by a stable unique game ID and contains:
 
-- `title`, `kicker`, `description`: game picker and landing-page details.
-- `chapters`: total chapter count shown in the journey panel.
-- `start`: ID of the first scene.
-- `stats`: starting values for `energy`, `courage`, and `insight`.
-- `quests`: quest definitions with unique IDs, descriptions, and `availableAt` scene IDs; add IDs to `effects.completeQuests` when players complete them.
-- `items`: item definitions (`name`, `icon`, `description`).
-- `scenes`: scene records with `chapter`, `icon`, `title`, `text`, and `choices`.
+- `title`, `kicker`, `description`: picker and landing-page details.
+- `chapters`, `start`, `stats`: chapter count, first scene ID, and starting `energy`, `courage`, `insight` values.
+- `quests`: optional list of `{ id, title, description, availableAt, optional }`; scene effects can complete quest IDs.
+- `items`: optional map of stable item IDs to `{ name, icon, description }`.
+- `scenes`: map from stable scene ID to `{ chapter, icon, title, text, choices }`.
+- Each choice has a `label`, a valid destination `next`, and optional `effects`: `stats` deltas, `items` changes (`{ id, quantity }`, quantity defaults to +1), `completeQuests` IDs, or an `ending` key.
 
-A choice uses `next` for its destination scene and can have `effects.stats`, `effects.items`, `effects.completeQuests`, or `effects.ending`. Item changes use `{ id: 'item-id' }` to add one item, `{ id: 'item-id', quantity: -1 }` to remove one. Use the existing Lantern story as a working example. Every game has its own browser save key, so progress in one game does not overwrite another.
+Keep IDs stable after release to preserve existing saves. All choice destinations should exist. Ending scenes should use ID `ending` for the default replay experience.
 
-The game selector is populated from the registry automatically. Keep game IDs and scene/quest/item IDs stable after release so saved progress remains compatible. This demo stores progress in the current browser only; it does not provide accounts or cross-device saves.
+## Add, import, and export packs
+
+The Game pack tools on the game page can create a starter pack, import JSON, and export the selected game as JSON. Imported or created packs persist in the current browser and are not automatically committed to the repository. Export a pack, review it, then add it to the built-in registry to ship it to all players. Imported pack validation checks required metadata, starting stats, scenes, and choice destinations; only import JSON from a trusted source.
+
+To add a built-in game, add another entry to `contrigamebot-games.js` using the Clockwork Lighthouse or Lantern game as an example. The current save system is local-browser prototype functionality: there are no accounts, server saves, or cross-device synchronization.

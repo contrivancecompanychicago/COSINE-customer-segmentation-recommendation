@@ -10,9 +10,14 @@
 <body>
   <main class="game-shell">
     <header class="topbar">
-      <a class="wordmark" href="contrigamebot.html" aria-label="ContriGameBot home"><span class="brand-mark" aria-hidden="true">✦</span> CONTRIGAMEBOT</a>
+      <a class="wordmark" href="contrigamebot.html" aria-label="ContriGameBot home"><span class="brand-mark" aria-hidden="true">✦</span> CONTRIGAMEBOT <span class="version-badge">v0.2.0</span></a>
       <div class="topbar-tools">
-        <span class="version-badge" aria-label="ContriGameBot version 0.1.0">v0.1.0</span>
+        <label class="profile-label" for="player-name">PLAYER
+          <input id="player-name" type="text" maxlength="24" value="Player" autocomplete="nickname">
+        </label>
+        <label class="profile-label" for="save-slot">SAVE SLOT
+          <select id="save-slot"><option value="1">Slot 1</option><option value="2">Slot 2</option><option value="3">Slot 3</option></select>
+        </label>
         <label class="game-picker-label" for="game-picker">GAME WORLD
           <select id="game-picker" aria-label="Choose a game"></select>
         </label>
@@ -33,8 +38,8 @@
           <div class="status-row"><span>Energy</span><strong id="energy-stat">3</strong></div>
           <div class="status-row"><span>Courage</span><strong id="courage-stat">0</strong></div>
           <div class="status-row"><span>Insight</span><strong id="insight-stat">0</strong></div>
-          <p class="save-note" id="save-note">Progress saves in this browser.</p>
-          <button class="reset-button" id="reset-game" type="button">Restart this game</button>
+          <p class="save-note" id="save-note" role="status">Progress saves in this browser.</p>
+          <div class="save-actions"><button class="reset-button" id="save-now" type="button">Save now</button><button class="reset-button" id="reset-game" type="button">Restart game</button></div>
         </section>
         <section class="panel quest-panel" aria-labelledby="quests-heading">
           <div class="panel-title-row"><h2 id="quests-heading">Quest log</h2><span class="count-pill" id="quest-count">0/0</span></div>
@@ -55,7 +60,27 @@
       </article>
     </section>
 
-    <footer class="footnote">A modular, choice-based Game Master demo. This fictional story does not collect health information or provide medical advice.</footer>
+    <details class="pack-tools">
+      <summary>Game pack tools <span>Build and move your own game worlds</span></summary>
+      <div class="pack-tool-grid">
+        <form id="pack-create-form" class="pack-form">
+          <h2>Create a starter game</h2>
+          <label>Game title<input id="new-game-title" required maxlength="60" placeholder="The Crystal Caverns"></label>
+          <label>Short description<textarea id="new-game-description" required maxlength="240" rows="3" placeholder="A new adventure begins…"></textarea></label>
+          <button class="tool-button" type="submit">Create starter pack</button>
+          <p class="tool-help">Creates a small editable-in-code template with a beginning, two choices, and an ending.</p>
+        </form>
+        <div class="pack-form">
+          <h2>Import or export</h2>
+          <label>Import game pack (.json)<input id="pack-import" type="file" accept="application/json,.json"></label>
+          <button class="tool-button secondary" id="pack-export" type="button">Export selected game</button>
+          <p class="tool-help">Imported packs stay in this browser. Export JSON to share or add the pack to your project.</p>
+          <p id="pack-status" class="tool-help" role="status"></p>
+        </div>
+      </div>
+    </details>
+
+    <footer class="footnote">A modular, choice-based Game Master demo. Saves and imported packs stay in this browser. The fictional stories do not collect health information or provide medical advice.</footer>
   </main>
   <script src="../js/contrigamebot-games.js" defer></script>
   <script src="../js/contrigamebot.js" defer></script>
