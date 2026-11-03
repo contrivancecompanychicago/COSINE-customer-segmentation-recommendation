@@ -21,16 +21,16 @@
     event.preventDefault(); const query = input.value.trim(); if (!query) return;
     message('You', query);
     const { matches, alternatives } = api.recommend(catalog, query);
-    const reply = message('ContriGameBot', matches.length ? 'Here are catalog matches. Check the notes before choosing.' : 'No confirmed match for that request. These available games are alternatives, not verified matches:');
+    const reply = message('ContriGameBot', matches.length ? 'Here are catalog matches. Check the notes before choosing.' : 'No confirmed match for that request. These catalog entries are alternatives, not verified matches:');
     const entries = matches.length ? matches : alternatives;
-    if (!entries.length) { const p = document.createElement('p'); p.textContent = 'No available catalog games meet the known constraints. Try different preferences.'; reply.append(p); }
+    if (!entries.length) { const p = document.createElement('p'); p.textContent = 'No available catalog entries meet the known constraints. Try different preferences.'; reply.append(p); }
     entries.forEach(({ game, reasons, unknowns }) => {
       const card = document.createElement('section'); card.className = 'result';
       const title = document.createElement('h3'); title.textContent = game.title;
       const desc = document.createElement('p'); desc.textContent = game.description;
       const why = document.createElement('p'); why.textContent = reasons.length ? 'Matches: ' + reasons.join(', ') + '.' : 'Alternative from the catalog; no matching attributes were confirmed.';
       const note = document.createElement('p'); note.className = 'note'; note.textContent = unknowns.join(' ');
-      const link = document.createElement('a'); link.href = game.playUrl; link.textContent = 'Play ' + game.title;
+      const link = document.createElement('a'); link.href = game.playUrl; link.textContent = api.actionLabel(game);
       card.append(title, desc, why, note, link); reply.append(card);
     });
     input.value = ''; input.focus();

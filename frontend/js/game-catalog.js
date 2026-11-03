@@ -27,6 +27,14 @@
         formats: ['text adventure', 'command based', 'choice based'], platforms: ['browser'],
         devices: null, sessionMinutes: null, status: 'playable',
         playUrl: 'https://krebsvilleunequaltreatmentpt-1.replit.app'
+      },
+      {
+        id: 'culapsedatafarm-agent-lab', title: 'CULAPSEDataFarm: Kaggriculture Agent Lab',
+        description: 'The CULAPSE Data Farm Agent Lab project hub. Gameplay availability has not been verified.',
+        genres: [], themes: ['culapse', 'data farm', 'kaggriculture', 'agent lab'],
+        formats: [], platforms: ['browser'],
+        devices: null, sessionMinutes: null, status: 'project-hub',
+        playUrl: 'https://culapsedatafarm-agent-lab.erichilarysmithsr.chatgpt.site'
       }
     ]
   };

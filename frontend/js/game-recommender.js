@@ -24,9 +24,9 @@
       for (const key of ['genres', 'themes', 'formats', 'platforms']) if (!list(game[key])) errors.push(id + ': ' + key + ' must be a string array.');
       if (game.devices !== null && !list(game.devices)) errors.push(id + ': devices must be a string array or null (unknown).');
       if (game.sessionMinutes !== null && (!Number.isInteger(game.sessionMinutes) || game.sessionMinutes < 1)) errors.push(id + ': sessionMinutes must be positive or null (unknown).');
-      if (!['playable', 'coming-soon', 'unavailable'].includes(game.status)) errors.push(id + ': invalid status.');
+      if (!['playable', 'project-hub', 'coming-soon', 'unavailable'].includes(game.status)) errors.push(id + ': invalid status.');
       if (game.playUrl !== null && !safeUrl(game.playUrl)) errors.push(id + ': unsafe or invalid playUrl.');
-      if (game.status === 'playable' && !safeUrl(game.playUrl)) errors.push(id + ': playable games need a playUrl.');
+      if (['playable', 'project-hub'].includes(game.status) && !safeUrl(game.playUrl)) errors.push(id + ': discoverable entries need a playUrl.');
       if (game.packId !== undefined && (!text(game.packId) || (packs && !Object.hasOwn(packs, game.packId)))) errors.push(id + ': unknown packId.');
       if (game.packId && game.playUrl !== 'contrigamebot.html?game=' + encodeURIComponent(game.packId)) errors.push(id + ': pack link must match packId.');
     }
@@ -41,7 +41,7 @@
     const time = query.match(/\b(\d+)\s*(?:minutes?|mins?)\b/i);
     const maxMinutes = time ? Number(time[1]) : has('short', 'quick') ? 15 : null;
     const results = [];
-    for (const game of catalog.games.filter(g => g.status === 'playable')) {
+    for (const game of catalog.games.filter(g => ['playable', 'project-hub'].includes(g.status))) {
       if (device && game.devices !== null && !game.devices.includes(device)) continue;
       if (maxMinutes !== null && game.sessionMinutes !== null && game.sessionMinutes > maxMinutes) continue;
       const matched = [];
@@ -53,7 +53,7 @@
       if (device && game.devices?.includes(device)) matched.push(device + ' support');
       if (maxMinutes !== null && game.sessionMinutes !== null) matched.push(game.sessionMinutes + ' minute session');
       const reasons = [...new Set(matched)];
-      const unknowns = [];
+      const unknowns = game.status === 'project-hub' ? ['Project hub; gameplay availability is unverified.'] : [];
       if (device && game.devices === null) unknowns.push('Device support is unknown.');
       if (maxMinutes !== null && game.sessionMinutes === null) unknowns.push('Session length is unknown.');
       results.push({ game, score: reasons.length, reasons, unknowns });
@@ -62,7 +62,8 @@
     const matches = results.filter(r => r.score > 0);
     return { matches: matches.slice(0, 3), alternatives: matches.length ? [] : results.slice(0, 3) };
   }
-  const api = { validateCatalog, recommend, safeUrl };
+  const actionLabel = (game) => (game.status === 'project-hub' ? 'Open project hub: ' : 'Play ') + game.title;
+  const api = { validateCatalog, recommend, safeUrl, actionLabel };
   if (typeof module === 'object' && module.exports) module.exports = api;
   else root.ContriGameRecommender = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);
