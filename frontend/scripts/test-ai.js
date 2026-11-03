@@ -35,6 +35,15 @@ async function main() {
   await assert.rejects(aiRecommend(messages, { apiKey: 'test-secret', fetchImpl: async () => ({ ok: false }) }));
   await assert.rejects(aiRecommend(messages, { apiKey: 'test-secret', fetchImpl: async () => ({ ok: true, json: async () => ({ status: 'incomplete', output: [] }) }) }));
   await assert.rejects(aiRecommend(messages, { apiKey: 'test-secret', fetchImpl: async () => ({ ok: true, json: async () => ({ status: 'completed', output: [{ type: 'message', content: [{ type: 'refusal' }] }] }) }) }));
+  for (const [status, upstreamCode, expected] of [
+    [401, 'invalid_api_key', 'AI_AUTH'], [429, 'insufficient_quota', 'AI_QUOTA'],
+    [429, 'rate_limit_exceeded', 'AI_RATE_LIMIT'], [404, 'model_not_found', 'AI_MODEL'],
+    [400, 'unsupported_parameter', 'AI_REQUEST']
+  ]) {
+    await assert.rejects(aiRecommend(messages, { apiKey: 'test-secret', fetchImpl: async () => ({
+      ok: false, status, json: async () => ({ error: { code: upstreamCode, message: 'test-secret private data' } })
+    }) }), error => error.code === expected && !error.message.includes('test-secret'));
+  }
   const post = (base, body, headers = {}) => fetch(base + '/api/recommend', { method: 'POST', headers: { 'Content-Type': 'application/json', ...headers }, body: JSON.stringify(body) });
   await withServer({ apiKey: '', fetchImpl: () => { throw Error('Must not call provider'); } }, async base => {
     assert.deepEqual(await (await fetch(base + '/api/config')).json(), { aiEnabled: false });
@@ -61,6 +70,13 @@ async function main() {
   await withServer({ apiKey: 'test-secret', fetchImpl: async () => { throw Error('test-secret upstream error'); } }, async base => {
     const res = await post(base, { messages }); assert.equal(res.status, 503);
     assert.ok(!(await res.text()).includes('test-secret'));
+  });
+  await withServer({ apiKey: 'test-secret', fetchImpl: async () => ({
+    ok: false, status: 429, json: async () => ({ error: { code: 'insufficient_quota', message: 'test-secret' } })
+  }) }, async base => {
+    const res = await post(base, { messages }); const body = await res.json();
+    assert.equal(res.status, 503); assert.equal(body.code, 'AI_QUOTA');
+    assert.ok(!JSON.stringify(body).includes('test-secret'));
   });
   console.log('AI tests passed: structured plans, grounding, context, exclusions, HTTP boundaries, rate limit, fallback errors.');
 }

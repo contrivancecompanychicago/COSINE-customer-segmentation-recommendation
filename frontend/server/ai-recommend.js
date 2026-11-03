@@ -42,10 +42,31 @@ function rankPlan(plan) {
   const matches = rows.filter(row => row.score > 0).slice(0, 3);
   return { matches, alternatives: matches.length ? [] : rows.slice(0, 3), clarification: null };
 }
+const diagnostics = {
+  AI_AUTH: 'The API key was rejected. Check the server-side key.',
+  AI_QUOTA: 'The API account has insufficient quota. Check API billing and usage limits.',
+  AI_RATE_LIMIT: 'The API rate limit was reached. Wait briefly and try again.',
+  AI_MODEL: 'The configured model is unavailable to this API project.',
+  AI_REQUEST: 'The API rejected the request configuration.',
+  AI_TIMEOUT: 'The AI request timed out. Try again.',
+  AI_NETWORK: 'The server could not connect to the AI service.',
+  AI_INCOMPLETE: 'The AI response did not finish. Try again.',
+  AI_REFUSAL: 'The AI service declined this request. Try another game preference.',
+  AI_INVALID: 'The AI response could not be validated against the catalog.',
+  AI_UNAVAILABLE: 'The AI service is currently unavailable.'
+};
+class AiError extends Error {
+  constructor(code) { super(diagnostics[code]); this.code = code; }
+}
+function publicDiagnostic(error) {
+  const code = error instanceof AiError && Object.hasOwn(diagnostics, error.code) ? error.code : 'AI_UNAVAILABLE';
+  return { code, error: diagnostics[code] };
+}
 async function aiRecommend(messages, { apiKey, model = 'gpt-5-mini', fetchImpl = fetch } = {}) {
-  if (!apiKey) throw new Error('AI unavailable');
+  if (!apiKey) throw new AiError('AI_AUTH');
   const errors = validateCatalog(catalog); if (errors.length) throw new Error('Invalid catalog');
-  const response = await fetchImpl('https://api.openai.com/v1/responses', {
+  let response;
+  try { response = await fetchImpl('https://api.openai.com/v1/responses', {
     method: 'POST', signal: AbortSignal.timeout(25000),
     headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + apiKey },
     body: JSON.stringify({ model, store: false, max_output_tokens: 2500, reasoning: { effort: 'low' },
@@ -54,12 +75,24 @@ async function aiRecommend(messages, { apiKey, model = 'gpt-5-mini', fetchImpl =
       text: { format: { type: 'json_schema', name: 'game_preferences', strict: true, schema } }
     })
   });
-  if (!response.ok) throw new Error('AI unavailable');
-  const data = await response.json();
-  if (data.status !== 'completed') throw new Error('Incomplete response');
+  } catch (error) {
+    throw new AiError(['AbortError', 'TimeoutError'].includes(error.name) ? 'AI_TIMEOUT' : 'AI_NETWORK');
+  }
+  if (!response.ok) {
+    let failure = {}; try { failure = await response.json(); } catch (_) { /* Ignore untrusted provider bodies. */ }
+    const code = failure?.error?.code;
+    if (response.status === 401) throw new AiError('AI_AUTH');
+    if (code === 'insufficient_quota') throw new AiError('AI_QUOTA');
+    if (response.status === 429) throw new AiError('AI_RATE_LIMIT');
+    if (code === 'model_not_found' || response.status === 403 || response.status === 404) throw new AiError('AI_MODEL');
+    if (response.status === 400) throw new AiError('AI_REQUEST');
+    throw new AiError('AI_UNAVAILABLE');
+  }
+  let data; try { data = await response.json(); } catch (_) { throw new AiError('AI_INVALID'); }
+  if (data.status !== 'completed') throw new AiError('AI_INCOMPLETE');
   const output = (data.output || []).filter(item => item.type === 'message').flatMap(item => item.content || []);
-  if (output.some(item => item.type === 'refusal')) throw new Error('AI unavailable');
+  if (output.some(item => item.type === 'refusal')) throw new AiError('AI_REFUSAL');
   const text = output.filter(item => item.type === 'output_text').map(item => item.text).join('');
-  return rankPlan(JSON.parse(text));
+  try { return rankPlan(JSON.parse(text)); } catch (_) { throw new AiError('AI_INVALID'); }
 }
-module.exports = { aiRecommend, rankPlan, validPlan };
+module.exports = { aiRecommend, rankPlan, validPlan, publicDiagnostic };

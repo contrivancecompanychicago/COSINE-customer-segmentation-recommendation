@@ -42,21 +42,38 @@
     const useAi = toggle.checked;
     message('You', query);
     history.push({ role: 'user', content: query }); history = history.slice(-8);
-    let data, fallback = false;
+    let data, fallback = false, failureCode = '';
     try {
       if (useAi) {
         modeNote.textContent = 'Understanding your preferences…';
         try {
           const response = await fetch('/api/recommend', { method: 'POST', headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ messages: history }), signal: AbortSignal.timeout(30000) });
-          if (!response.ok) throw new Error('AI unavailable');
+          if (!response.ok) {
+            const failure = await response.json().catch(() => ({}));
+            failureCode = failure.code;
+            throw new Error('AI unavailable');
+          }
           data = await response.json();
           if (data.mode !== 'ai' || !Array.isArray(data.matches) || !Array.isArray(data.alternatives)) throw new Error('Invalid response');
           modeNote.textContent = 'AI mode: preferences interpreted with AI; game details and links come from the catalog.';
         } catch (_) {
           fallback = true; history = [];
           data = api.recommend(catalog, query);
-          modeNote.textContent = 'AI is unavailable. This reply uses keyword matching for your latest request only; conversation context was reset.';
+          const diagnostics = {
+            AI_AUTH: 'The API key was rejected.',
+            AI_QUOTA: 'API quota is insufficient; check API billing and usage limits.',
+            AI_RATE_LIMIT: 'The API rate limit was reached; wait and retry.',
+            AI_MODEL: 'The configured model is unavailable to your API project.',
+            AI_REQUEST: 'The API rejected the request configuration.',
+            AI_TIMEOUT: 'The AI request timed out.',
+            AI_NETWORK: 'The server could not connect to the AI service.',
+            AI_INCOMPLETE: 'The AI response did not finish.',
+            AI_REFUSAL: 'The AI service declined this request.',
+            AI_INVALID: 'The AI response could not be validated against the catalog.'
+          };
+          const detail = Object.hasOwn(diagnostics, failureCode) ? diagnostics[failureCode] : 'AI is unavailable.';
+          modeNote.textContent = detail + ' This reply uses keyword matching for your latest request only; conversation context was reset.';
         }
       } else data = api.recommend(catalog, query);
       const { matches, alternatives, clarification } = data;
