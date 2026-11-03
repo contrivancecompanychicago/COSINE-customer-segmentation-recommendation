@@ -44,3 +44,7 @@ Keep the catalog and ranking API as the factual source. A future server-side mod
 ## Validation
 
 Run `npm test` from `frontend`, then `npm pack --dry-run`. Tests cover built-in pack references, duplicate IDs, unsafe URLs, unknown metadata, ranking, incompatible preferences, external entries, and unavailable games. These are automated data and logic checks; browser usability and real device support require separate review.
+
+## First external listing
+
+Krebsville Nights: Unequal Treatment links to https://krebsvilleunequaltreatmentpt-1.replit.app, supplied by the project owner. On 2026-11-03 the page returned HTTP 200 and identified itself as Krebsville Nights: Unequal Treatment / COSINE MUD. Its HTML includes hospital scenes, command input, available actions, and quest scripts. These support the catalog description and tags. Full gameplay, device compatibility, and session duration were not verified; the latter two remain null. This external game does not need a built-in scene pack.
